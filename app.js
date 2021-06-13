@@ -46,7 +46,6 @@ var mongoDB = 'mongodb+srv://local_library_user:passnodeword@cluster0.mj678.mong
 mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
 module.exports = app;
 
 
