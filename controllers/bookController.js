@@ -6,52 +6,40 @@ const async = require('async');
 
 const { body, validationResult } = require('express-validator');
 
-
-exports.index = function(req, res) {
+exports.index = (req, res) => {
   async.parallel({
-    book_count: function(callback) {
-      Book.countDocuments({}, callback); // Pass an empty object as match condition to find all documents of this collection
-    },
-    book_instance_count: function(callback) {
-      BookInstance.countDocuments({}, callback);
-    },
-    book_instance_available_count: function(callback) {
-      BookInstance.countDocuments({status:'Available'}, callback);
-    },
-    author_count: function(callback) {
-      Author.countDocuments({}, callback);
-    },
-    genre_count: function(callback) {
-      Genre.countDocuments({}, callback);
-    }
-  }, function(err, results) {
+    book_count: callback => Book.countDocuments({}, callback),
+    book_instance_count: callback => BookInstance.countDocuments({}, callback),
+    book_instance_available_count: callback => BookInstance.countDocuments({status:'Available'}, callback),
+    author_count: callback => Author.countDocuments({}, callback),
+    genre_count: callback => Genre.countDocuments({}, callback),
+  }, (err, results) => {
     res.render('index', { title: 'Local Library Home', error: err, data: results });
   });
 };
 
-exports.book_list = function(req, res, next) {
+exports.book_list = (req, res, next) => {
   Book.find({}, 'title author')
     .populate('author')
-    .exec(function (err, list_books) {
+    .exec( (err, list_books) => {
       if (err) return next(err)
       res.render('book_list', { title: 'Book List', book_list: list_books });
     });
-
 };
 
-exports.book_detail = function({params: {id}}, res, next) {
+exports.book_detail = ({params: {id}}, res, next) => {
   async.parallel({
-    book: function(callback) {
+    book: (callback) => {
       Book.findById(id)
         .populate('author')
         .populate('genre')
         .exec(callback);
     },
-    book_instance: function(callback) {
+    book_instance: (callback) => {
       BookInstance.find({ 'book': id })
         .exec(callback);
     },
-  }, function(err, {book, book_instance}) {
+  }, (err, {book, book_instance}) => {
     if (err) return next(err)
     if (!book) {
       const err = new Error('Book not found');
@@ -62,7 +50,7 @@ exports.book_detail = function({params: {id}}, res, next) {
   });
 };
 
-exports.book_create_get = function(req, res, next) {
+exports.book_create_get = (req, res, next) => {
   async.parallel({
     authors: callback => Author.find(callback),
     genres: callback => Genre.find(callback),
@@ -119,13 +107,9 @@ exports.book_create_post = [
   }
 ];
 
-exports.book_delete_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: Book delete GET');
-};
+exports.book_delete_get = (req, res) => res.send('NOT IMPLEMENTED: Book delete GET');
 
-exports.book_delete_post = function(req, res) {
-  res.send('NOT IMPLEMENTED: Book delete POST');
-};
+exports.book_delete_post = (req, res) => res.send('NOT IMPLEMENTED: Book delete POST');
 
 exports.book_update_get = (req, res, next) => {
   async.parallel({
@@ -140,8 +124,8 @@ exports.book_update_get = (req, res, next) => {
       return next(err);
     }
 
-    for (var all_g_iter = 0; all_g_iter < results.genres.length; all_g_iter++) {
-      for (var book_g_iter = 0; book_g_iter < results.book.genre.length; book_g_iter++) {
+    for (let all_g_iter = 0; all_g_iter < results.genres.length; all_g_iter++) {
+      for (let book_g_iter = 0; book_g_iter < results.book.genre.length; book_g_iter++) {
         if (results.genres[all_g_iter]._id.toString() === results.book.genre[book_g_iter]._id.toString()) {
           results.genres[all_g_iter].checked = 'true';
         }
@@ -172,14 +156,7 @@ exports.book_update_post = [
     const errors = validationResult(req);
     const {body: {title, author, summary, isbn}, params: {id}} = req;
 
-    const book = new Book(
-      { title,
-        author,
-        summary,
-        isbn,
-        genre: (typeof genre === 'undefined') ? [] : genre,
-        _id: id
-      });
+    const book = new Book({ title, author, summary, isbn, genre: (typeof genre === 'undefined') ? [] : genre, _id: id });
 
     if (!errors.isEmpty()) {
       async.parallel({
