@@ -1,30 +1,22 @@
-var Genre = require('../models/genre');
-var Book = require('../models/book');
-var async = require('async');
+const Genre = require('../models/genre');
+const Book = require('../models/book');
+const async = require('async');
 const { body, validationResult } = require('express-validator');
 
-exports.genre_list = function(req, res, next) {
+exports.genre_list = (req, res, next) => {
   Genre.find()
     .sort([['name', 'ascending']])
-    .exec(function(err, list_genres) {
+    .exec((err, list_genres) => {
       if (err) return next(err)
       res.render('genre_list', {title: 'Genre List', genre_list: list_genres})
     })
 };
 
-exports.genre_detail = function(req, res, next) {
+exports.genre_detail = (req, res, next) => {
   async.parallel({
-    genre: function(callback) {
-      Genre.findById(req.params.id)
-        .exec(callback);
-    },
-
-    genre_books: function(callback) {
-      Book.find({ 'genre': req.params.id })
-        .exec(callback);
-    },
-
-  }, function(err, {genre, genre_books}) {
+    genre: (callback) => Genre.findById(req.params.id).exec(callback),
+    genre_books: (callback) => Book.find({ 'genre': req.params.id }).exec(callback),
+  }, (err, {genre, genre_books}) => {
     if (err) return next(err)
     if (!genre) {
       const err = new Error('Genre not found');
@@ -36,7 +28,7 @@ exports.genre_detail = function(req, res, next) {
   });
 };
 
-exports.genre_create_get = function(req, res, next) {
+exports.genre_create_get = (req, res) => {
   res.render('genre_form', { title: 'Create Genre' });
 };
 
@@ -62,7 +54,7 @@ exports.genre_create_post = [
             res.redirect(found_genre.url);
           }
           else {
-            genre.save(function (err) {
+            genre.save( err => {
               if (err) return next(err)
               res.redirect(genre.url);
             });
@@ -72,18 +64,18 @@ exports.genre_create_post = [
   }
 ];
 
-exports.genre_delete_get = function(req, res) {
+exports.genre_delete_get = (req, res) => {
   res.send('NOT IMPLEMENTED: Genre delete GET');
 };
 
-exports.genre_delete_post = function(req, res) {
+exports.genre_delete_post = (req, res) => {
   res.send('NOT IMPLEMENTED: Genre delete POST');
 };
 
-exports.genre_update_get = function(req, res) {
+exports.genre_update_get = (req, res) => {
   res.send('NOT IMPLEMENTED: Genre update GET');
 };
 
-exports.genre_update_post = function(req, res) {
+exports.genre_update_post = (req, res) => {
   res.send('NOT IMPLEMENTED: Genre update POST');
 };
