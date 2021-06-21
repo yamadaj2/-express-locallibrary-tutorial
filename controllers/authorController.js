@@ -1,9 +1,9 @@
-var Author = require('../models/author');
-var async = require('async');
-var Book = require('../models/book');
+const Author = require('../models/author');
+const async = require('async');
+const Book = require('../models/book');
 const { body, validationResult } = require('express-validator');
 
-exports.author_list = function(req, res, next) {
+exports.author_list = (req, res, next) => {
   Author.find()
     .sort([['family_name', 'ascending']])
     .exec(function (err, list_authors) {
@@ -12,16 +12,11 @@ exports.author_list = function(req, res, next) {
     });
 };
 
-// Display detail page for a specific Author.
-exports.author_detail = function({params: {id}}, res, next) {
+exports.author_detail = ({params: {id}}, res, next) => {
   async.parallel({
-    author: function(callback) {
-      Author.findById(id).exec(callback)
-    },
-    authors_books: function(callback) {
-      Book.find({ 'author': id },'title summary').exec(callback)
-    },
-  }, function(err, {author, authors_books}) {
+    author: callback => Author.findById(id).exec(callback),
+    authors_books: callback => Book.find({ 'author': id },'title summary').exec(callback),
+  }, (err, {author, authors_books}) => {
     if (err) return next(err)
     if (!author) {
       const err = new Error('Author not found');
@@ -33,7 +28,7 @@ exports.author_detail = function({params: {id}}, res, next) {
   });
 };
 
-exports.author_create_get = function(req, res) {
+exports.author_create_get = (req, res) => {
   res.render('author_form', {title: 'Create Author'});
 };
 
@@ -59,7 +54,7 @@ exports.author_create_post = [
       return;
     }
 
-    var author = new Author({first_name, family_name, date_of_birth, date_of_death});
+    const author = new Author({first_name, family_name, date_of_birth, date_of_death});
     author.save( err => {
       if (err) return next(err)
 
@@ -79,7 +74,7 @@ exports.author_delete_get = ({params: {id}}, res, next) => {
   });
 };
 
-exports.author_delete_post = function({body: {authorid}}, res, next) {
+exports.author_delete_post = ({body: {authorid}}, res, next) => {
   async.parallel({
     author: callback => Author.findById(authorid).exec(callback),
     authors_books: callback => Book.find({ 'author': authorid }).exec(callback),
@@ -98,10 +93,10 @@ exports.author_delete_post = function({body: {authorid}}, res, next) {
   });
 };
 
-exports.author_update_get = function(req, res) {
+exports.author_update_get = (req, res) => {
   res.send('NOT IMPLEMENTED: Author update GET');
 };
 
-exports.author_update_post = function(req, res) {
+exports.author_update_post = (req, res) => {
   res.send('NOT IMPLEMENTED: Author update POST');
 };
