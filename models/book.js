@@ -1,8 +1,7 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var Schema = mongoose.Schema;
-
-var BookSchema = new Schema(
+const BookSchema = new Schema(
   {
     title: {type: String, required: true},
     summary: {type: String, required: true},
@@ -12,12 +11,8 @@ var BookSchema = new Schema(
   }
 );
 
-// Virtual for book's URL
 BookSchema
   .virtual('url')
-  .get(function () {
-    return '/catalog/book/' + this._id;
-  });
+  .get(() => `/catalog/book/${this._id}`);
 
-//Export model
 module.exports = mongoose.model('Book', BookSchema);

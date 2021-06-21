@@ -6,7 +6,7 @@ const { body, validationResult } = require('express-validator');
 exports.author_list = (req, res, next) => {
   Author.find()
     .sort([['family_name', 'ascending']])
-    .exec(function (err, list_authors) {
+    .exec((err, list_authors) => {
       if (err) return next(err)
       res.render('author_list', { title: 'Author List', author_list: list_authors });
     });

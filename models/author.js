@@ -1,8 +1,7 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var Schema = mongoose.Schema;
-
-var AuthorSchema = new Schema(
+const AuthorSchema = new Schema(
   {
     first_name: {type: String, required: true, maxLength: 100},
     family_name: {type: String, required: true, maxLength: 100},
@@ -11,17 +10,13 @@ var AuthorSchema = new Schema(
   }
 );
 
-// Virtual for author's full name
 AuthorSchema
   .virtual('name')
-  .get(function () {
-    return this.family_name + ', ' + this.first_name;
-  });
+  .get(() => `${this.family_name}, ${this.first_name}`);
 
-// Virtual for author's lifespan
 AuthorSchema
   .virtual('lifespan')
-  .get(function () {
+  .get(() => {
     const {date_of_death, date_of_birth} = this
 
     if (date_of_death && date_of_birth) {
@@ -32,12 +27,8 @@ AuthorSchema
     return 'N/A'
   });
 
-// Virtual for author's URL
 AuthorSchema
   .virtual('url')
-  .get(function () {
-    return '/catalog/author/' + this._id;
-  });
+  .get(() => `/catalog/author/${this._id}`);
 
-//Export model
 module.exports = mongoose.model('Author', AuthorSchema);
