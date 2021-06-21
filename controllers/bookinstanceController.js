@@ -2,10 +2,10 @@ const BookInstance = require('../models/bookinstance');
 const { body, validationResult } = require('express-validator');
 const Book = require('../models/book');
 
-exports.bookinstance_list = function(req, res, next) {
+exports.bookinstance_list = (req, res, next) => {
   BookInstance.find()
     .populate('book')
-    .exec(function (err, list_bookinstances) {
+    .exec((err, list_bookinstances) => {
       if (err) return next(err)
 
       res.render('bookinstance_list', { title: 'Book Instance List', bookinstance_list: list_bookinstances });
@@ -13,7 +13,7 @@ exports.bookinstance_list = function(req, res, next) {
 
 };
 
-exports.bookinstance_detail = function({params: {id}}, res, next) {
+exports.bookinstance_detail = ({params: {id}}, res, next) => {
   BookInstance.findById(id)
     .populate('book')
     .exec((err, bookinstance) => {
@@ -26,7 +26,6 @@ exports.bookinstance_detail = function({params: {id}}, res, next) {
 
       res.render('bookinstance_detail', { title: `Copy: ${bookinstance.book.title}`, bookinstance});
     })
-
 };
 
 exports.bookinstance_create_get = (req, res, next) => {
@@ -65,18 +64,18 @@ exports.bookinstance_create_post = [
   }
 ];
 
-exports.bookinstance_delete_get = function(req, res) {
+exports.bookinstance_delete_get = (req, res) => {
   res.send('NOT IMPLEMENTED: BookInstance delete GET');
 };
 
-exports.bookinstance_delete_post = function(req, res) {
+exports.bookinstance_delete_post = (req, res) => {
   res.send('NOT IMPLEMENTED: BookInstance delete POST');
 };
 
-exports.bookinstance_update_get = function(req, res) {
+exports.bookinstance_update_get = (req, res) => {
   res.send('NOT IMPLEMENTED: BookInstance update GET');
 };
 
-exports.bookinstance_update_post = function(req, res) {
+exports.bookinstance_update_post = (req, res) => {
   res.send('NOT IMPLEMENTED: BookInstance update POST');
 };
